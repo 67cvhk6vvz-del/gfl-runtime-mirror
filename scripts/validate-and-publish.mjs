@@ -12,7 +12,10 @@ try {
 } catch {
   throw new Error('SOURCE_NOT_JSON');
 }
-
+// The chat-compact transport wraps the canonical ESPN state in `state`.
+if (doc?.state && typeof doc.state === 'object') {
+  doc = doc.state;
+}
 const normalizeNum = (v) =>
   typeof v === 'string' && /^\d+$/.test(v) ? Number(v) : v;
 
