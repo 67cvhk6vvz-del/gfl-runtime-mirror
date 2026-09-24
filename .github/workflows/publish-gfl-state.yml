@@ -1,4 +1,4 @@
-name: Publish GFL Runtime State
+name: GFL Runtime Mirror
 
 on:
   workflow_dispatch:
