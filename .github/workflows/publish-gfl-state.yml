@@ -1,0 +1,62 @@
+name: Publish GFL Runtime State
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: gfl-runtime-state
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch current sanitized GFL state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime public
+          curl --fail --silent --show-error --location \
+            --connect-timeout 15 --max-time 45 \
+            'https://gfl-live-transport.netlify.app/gfl-espn-automation-state' \
+            --output .runtime/source.json
+          test -s .runtime/source.json
+
+      - name: Validate privacy and canonical identity
+        run: node scripts/validate-and-publish.mjs .runtime/source.json public/state.json
+
+      - name: Add health document
+        shell: bash
+        run: |
+          printf '{"service":"gfl-runtime-mirror","status":"PASS","generatedAt":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > public/health.json
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
