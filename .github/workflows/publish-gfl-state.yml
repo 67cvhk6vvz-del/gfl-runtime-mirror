@@ -37,8 +37,7 @@ jobs:
           mkdir -p .runtime public
           curl --fail --silent --show-error --location \
             --connect-timeout 15 --max-time 45 \
-            'https://gfl-live-transport.netlify.app/gfl-espn-automation-state' \
-            --output .runtime/source.json
+            'https://gfl-chat-state-233137.netlify.app/state.json' \
           test -s .runtime/source.json
 
       - name: Validate privacy and canonical identity
