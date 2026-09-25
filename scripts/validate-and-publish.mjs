@@ -39,8 +39,6 @@ const seasonCandidates = [
 const season = seasonCandidates
   .map(normalizeNum)
   .find((v) => Number.isInteger(v) && v >= 2000 && v <= 2100);
-);
-
 if (leagueId !== 233137) throw new Error(`WRONG_LEAGUE:${leagueId}`);
 if (season !== 2026) throw new Error(`WRONG_SEASON:${season}`);
 
