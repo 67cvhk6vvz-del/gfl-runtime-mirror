@@ -23,8 +23,22 @@ const leagueId = normalizeNum(
   doc.leagueId ?? doc.league?.id ?? doc.meta?.leagueId ?? doc.validation?.leagueId
 );
 
-const season = normalizeNum(
-  doc.season ?? doc.seasonId ?? doc.league?.season ?? doc.meta?.season ?? doc.validation?.season
+const seasonCandidates = [
+  doc.season,
+  doc.seasonId,
+  doc.league?.season,
+  doc.league?.seasonId,
+  doc.meta?.season,
+  doc.meta?.seasonId,
+  doc.validation?.season,
+  doc.validation?.seasonId,
+  doc.validation?.league?.season,
+  doc.validation?.league?.seasonId
+];
+
+const season = seasonCandidates
+  .map(normalizeNum)
+  .find((v) => Number.isInteger(v) && v >= 2000 && v <= 2100);
 );
 
 if (leagueId !== 233137) throw new Error(`WRONG_LEAGUE:${leagueId}`);
